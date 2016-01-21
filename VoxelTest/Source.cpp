@@ -9,6 +9,9 @@
 
 using namespace std;
 
+
+
+
 struct Vertex  //vertex struct - quick and dirty structs :D
 {
 	int x, y, z;
@@ -33,13 +36,14 @@ Vertex StartPoint = { 0, 0, 0 };
 Vertex CurrentPoint = StartPoint;
 int GetID[4];
 int GetIntersect[12];
-int GridNum =2;
+int GridNum =3;
 vector<Face> FaceList;
+
+
 
 //prototypes
 void CreateVerticies();
 bool GetQuad(int a, int b, int c, int j);
-Vertex MoveStartThroughAxes();
 void ThreeAxisSet();
 void EmptyArray();
 void QuadChecker();
@@ -83,6 +87,8 @@ int main()
 
 
 
+
+
 void QuadCreator()
 {
 	int QuadListCount = 0;
@@ -107,11 +113,7 @@ void QuadCreator()
 
 
 
-Vertex MoveStartThroughAxes()   //does nothing, gonna remove
-{
-	Vertex boom = { 0, 0, 0 };
-	return boom;
-}
+
 
 void ThreeAxisSet()  //cycles between 3 axises, XZ, YZ, and XY and refers to the actual quad solver. (THIS IS PART 1)
 {
@@ -229,6 +231,8 @@ void ThreeAxisSet()  //cycles between 3 axises, XZ, YZ, and XY and refers to the
 }
 
 
+
+
 bool GetQuad(int a, int b, int c, int j)     //the actual quad solver, uses a, b, and c, from part 1 and gets the quad
 {
 
@@ -258,6 +262,7 @@ bool GetQuad(int a, int b, int c, int j)     //the actual quad solver, uses a, b
 }
 
 
+
 void CreateVerticies()     //creates a grid of verticies in the x, y, and z directions
 {
 	int counter = 0;
@@ -275,6 +280,8 @@ void CreateVerticies()     //creates a grid of verticies in the x, y, and z dire
 		}
 	}
 }
+
+
 
 
 void QuadChecker()
