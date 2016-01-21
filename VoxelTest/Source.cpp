@@ -9,10 +9,19 @@
 
 using namespace std;
 
-struct Vertex  //vertex struct
+struct Vertex  //vertex struct - quick and dirty structs :D
 {
 	int x, y, z;
 };
+
+
+struct Face
+{
+	Vertex Points[4];
+	int QuadLoc[4];
+};
+
+
 
 //global variables
 vector<Vertex> PointList;
@@ -24,7 +33,8 @@ Vertex StartPoint = { 0, 0, 0 };
 Vertex CurrentPoint = StartPoint;
 int GetID[4];
 int GetIntersect[12];
-int GridNum = 3;
+int GridNum =2;
+vector<Face> FaceList;
 
 //prototypes
 void CreateVerticies();
@@ -32,14 +42,16 @@ bool GetQuad(int a, int b, int c, int j);
 Vertex MoveStartThroughAxes();
 void ThreeAxisSet();
 void EmptyArray();
+void QuadChecker();
+void QuadCreator();
+
+
 
 
 int main()
 {
 	CreateVerticies();  //makes the verticies
 	
-
-
 	for (int i = 0; i < GridNum; i++)
 	{
 		for (int j = 0; j < GridNum; j++)
@@ -49,29 +61,50 @@ int main()
 
 				StartPoint = { i, j, k };   //3D Startpoint to then decript using QuadSolver
 				ThreeAxisSet();
-				system("PAUSE");
+				//system("PAUSE");
 			}
 		}
 	}
 
+
+	cout << "size of PointList: " << PointList.size() << endl;
+	cout << "size of QuadList: " << QuadList.size() << endl;
+	cout << "number of Quads: " << QuadList.size() / 4 << endl;
+
+	QuadCreator();   // Takes from list into our quad struct
 	
-
-
-
-
-	for (int i = 0; i < QuadList.size(); i++)
-	{
-		cout << QuadList[i] << endl;
-	}
-
-	cout << "Number of Quads: " << QuadList.size() / 4 << endl;   //just a checker to see how many quads was accounted for **CURRENTLY NOT OPTIMIZED
-
-
+	QuadChecker();	// Checks to see if all is well for our quad struct
+	
 	system("PAUSE");
 	return 0;
 
 
 }
+
+
+
+void QuadCreator()
+{
+	int QuadListCount = 0;
+	while (QuadListCount < QuadList.size())
+	{
+		Vertex TempPoints[4];
+		int TempQuads[4];
+		Face TempFace;
+
+		for (int i = 0; i < 4; i++)
+		{
+			TempFace.Points[i] = PointList[QuadList[QuadListCount]];
+			TempFace.QuadLoc[i] = QuadList[QuadListCount];
+			QuadListCount += 1;
+
+		}
+		FaceList.push_back(TempFace);
+
+	}
+
+}
+
 
 
 Vertex MoveStartThroughAxes()   //does nothing, gonna remove
@@ -244,27 +277,30 @@ void CreateVerticies()     //creates a grid of verticies in the x, y, and z dire
 }
 
 
-/*cout << endl << "Size of Pointlist: " << PointList.size() << endl;
-for (int j = 0; j < 4; j++)
+void QuadChecker()
 {
-if (!NoQuad)
-{
+	for (int i = 0; i < FaceList.size(); i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			cout << FaceList[i].Points[j].x << " " << FaceList[i].Points[j].y << " " << FaceList[i].Points[j].z << "    ";
+		}
+		cout << endl;
 
-switch (j) //XZ plane
-{
-case 0:
-CurrentPoint = { StartPoint.x, StartPoint.y, StartPoint.z };
-break;
-case 1:
-CurrentPoint = { StartPoint.x + a, StartPoint.y, StartPoint.z };
-break;
-case 2:
-CurrentPoint = { StartPoint.x + 1, StartPoint.y, StartPoint.z + 1 };
-break;
-case 3:
-CurrentPoint = { StartPoint.x, StartPoint.y, StartPoint.z + 1 };
-break;
-}*/
+	}
+
+	cout << endl;
+
+	for (int i = 0; i < FaceList.size(); i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			cout << FaceList[i].QuadLoc[j] << "    ";
+		}
+		cout << endl;
+
+	}
+}
 
 
 
