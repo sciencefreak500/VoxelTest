@@ -56,6 +56,8 @@ int main()
 {
 	CreateVerticies();  //makes the verticies
 	
+
+
 	for (int i = 0; i < GridNum; i++)
 	{
 		for (int j = 0; j < GridNum; j++)
@@ -78,11 +80,12 @@ int main()
 	QuadCreator();   // Takes from list into our quad struct
 	
 	QuadChecker();	// Checks to see if all is well for our quad struct
-	
+
+
+#ifdef WIN32
 	system("PAUSE");
+#endif
 	return 0;
-
-
 }
 
 
