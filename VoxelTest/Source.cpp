@@ -22,6 +22,7 @@ struct Face
 {
 	Vertex Points[4];
 	int QuadLoc[4];
+	char Direction; // x = XZ,  y = YZ,  z = XY;
 };
 
 
@@ -35,6 +36,7 @@ vector<int> QuadList;
 Vertex StartPoint = { 0, 0, 0 };
 Vertex CurrentPoint = StartPoint;
 int GetID[4];
+Vertex GetPoints[4];
 int GetIntersect[12];
 int GridNum =3;
 vector<Face> FaceList;
@@ -45,7 +47,7 @@ vector<Face> FaceList;
 void CreateVerticies();
 bool GetQuad(int a, int b, int c, int j);
 void ThreeAxisSet();
-void EmptyArray();
+void EmptyArray(char Direction);
 void QuadChecker();
 void QuadCreator();
 
@@ -57,7 +59,7 @@ int main()
 	CreateVerticies();  //makes the verticies
 	
 
-
+	
 	for (int i = 0; i < GridNum; i++)
 	{
 		for (int j = 0; j < GridNum; j++)
@@ -74,15 +76,15 @@ int main()
 
 
 	cout << "size of PointList: " << PointList.size() << endl;
-	cout << "size of QuadList: " << QuadList.size() << endl;
-	cout << "number of Quads: " << QuadList.size() / 4 << endl;
+	cout << "Number of Faces: " << FaceList.size() << endl;
+	//cout << "number of Quads: " << FaceList.size() / 4 << endl;
 
-	QuadCreator();   // Takes from list into our quad struct
+//	QuadCreator();   // Takes from list into our quad struct
 	
 	QuadChecker();	// Checks to see if all is well for our quad struct
-
-
-#ifdef WIN32
+	
+	
+#ifdef _WIN32
 	system("PAUSE");
 #endif
 	return 0;
@@ -143,7 +145,7 @@ void ThreeAxisSet()  //cycles between 3 axises, XZ, YZ, and XY and refers to the
 		}
 		
 	}
-	cout << endl << "Connecting Points: " << GetID[0] << " " << GetID[1] << " " << GetID[2] << " " << GetID[3] << endl << endl;
+	//cout << endl << "Connecting Points: " << GetID[0] << " " << GetID[1] << " " << GetID[2] << " " << GetID[3] << endl << endl;
 	if (AllThreeTrue)
 	{
 		GetIntersect[0] = GetID[0];
@@ -151,7 +153,7 @@ void ThreeAxisSet()  //cycles between 3 axises, XZ, YZ, and XY and refers to the
 		GetIntersect[2] = GetID[2];        //these parts are just intersection tests
 		GetIntersect[3] = GetID[3];
 	}
-	EmptyArray();
+	EmptyArray('x');
 
 
 	for (int j = 0; j < 4; j++) //YZ axis
@@ -175,7 +177,7 @@ void ThreeAxisSet()  //cycles between 3 axises, XZ, YZ, and XY and refers to the
 		}
 		
 	}
-	cout << endl << "Connecting Points: " << GetID[0] << " " << GetID[1] << " " << GetID[2] << " " << GetID[3] << endl << endl;
+	//cout << endl << "Connecting Points: " << GetID[0] << " " << GetID[1] << " " << GetID[2] << " " << GetID[3] << endl << endl;
 	if (AllThreeTrue)
 	{
 		GetIntersect[4] = GetID[0];
@@ -183,7 +185,7 @@ void ThreeAxisSet()  //cycles between 3 axises, XZ, YZ, and XY and refers to the
 		GetIntersect[6] = GetID[2];
 		GetIntersect[7] = GetID[3];
 	}
-	EmptyArray();
+	EmptyArray('y');
 
 	for (int j = 0; j < 4; j++) //XY axis
 	{
@@ -206,7 +208,7 @@ void ThreeAxisSet()  //cycles between 3 axises, XZ, YZ, and XY and refers to the
 		}
 
 	}
-	cout << endl << "Connecting Points: " << GetID[0] << " " << GetID[1] << " " << GetID[2] << " " << GetID[3] << endl << endl;
+	//cout << endl << "Connecting Points: " << GetID[0] << " " << GetID[1] << " " << GetID[2] << " " << GetID[3] << endl << endl;
 	if (AllThreeTrue)
 	{
 		GetIntersect[8] = GetID[0];
@@ -214,7 +216,7 @@ void ThreeAxisSet()  //cycles between 3 axises, XZ, YZ, and XY and refers to the
 		GetIntersect[10] = GetID[2];
 		GetIntersect[11] = GetID[3];
 	}
-	EmptyArray();
+	EmptyArray('z');
 
 	if (!AllThreeTrue)
 	{
@@ -227,7 +229,7 @@ void ThreeAxisSet()  //cycles between 3 axises, XZ, YZ, and XY and refers to the
 	{
 		for (int i = 0; i < 12; i++)
 		{
-			cout << "Possible Intersection Point: "<< GetIntersect[i] << endl;     //not exactly.. just a test
+		//	cout << "Possible Intersection Point: "<< GetIntersect[i] << endl;     //not exactly.. just a test
 		}
 	}
 
@@ -246,7 +248,8 @@ bool GetQuad(int a, int b, int c, int j)     //the actual quad solver, uses a, b
 		if (CurrentPoint.x == PointList[i].x && CurrentPoint.y == PointList[i].y && CurrentPoint.z == PointList[i].z)
 		{
 			GetID[j] = i;
-			cout << "Found at: " << i << ", Point is: " << PointList[i].x << " " << PointList[i].y << " " << PointList[i].z << endl;
+			GetPoints[j] = CurrentPoint;
+		//	cout << "Found at: " << i << ", Point is: " << PointList[i].x << " " << PointList[i].y << " " << PointList[i].z << endl;
 			NoPointFound = false;
 			break;
 		}
@@ -255,7 +258,7 @@ bool GetQuad(int a, int b, int c, int j)     //the actual quad solver, uses a, b
 	}
 	if (NoPointFound)
 	{
-		cout << "NO QUADS!!!" << endl;   //if no vertex, then NO QUAD
+		//cout << "NO QUADS!!!" << endl;   //if no vertex, then NO QUAD
 		AllThreeTrue = false;
 		NoQuad = true;
 		return false;
@@ -277,7 +280,7 @@ void CreateVerticies()     //creates a grid of verticies in the x, y, and z dire
 			{
 
 				PointList.push_back({ i, j, k });
-				cout << PointList[counter].x << " " << PointList[counter].y << " " << PointList[counter].z << endl;
+			//	cout << PointList[counter].x << " " << PointList[counter].y << " " << PointList[counter].z << endl;
 				counter += 1;
 			}
 		}
@@ -295,7 +298,7 @@ void QuadChecker()
 		{
 			cout << FaceList[i].Points[j].x << " " << FaceList[i].Points[j].y << " " << FaceList[i].Points[j].z << "    ";
 		}
-		cout << endl;
+		cout << FaceList[i].Direction << endl;
 
 	}
 
@@ -314,21 +317,28 @@ void QuadChecker()
 
 
 
-void EmptyArray()     //Pushes from temp array to QuadList, which holds the vector for the actual quads
+void EmptyArray(char Direction)     //Pushes from temp array to QuadList, which holds the vector for the actual quads
 {
+	Face TempFace;
 	if (!NoQuad)
 	{
 		for (int z = 0; z < 4; z++)
 		{
-			QuadList.push_back(GetID[z]);
+			TempFace.Points[z] = GetPoints[z];
+			TempFace.QuadLoc[z] = GetID[z];
+			//QuadList.push_back(GetID[z]);
 			GetID[z] = NULL;
+			GetPoints[z] = {NULL,NULL,NULL};
 		}
+		TempFace.Direction = Direction;
+		FaceList.push_back(TempFace);
 	}
 	else
 	{
 		for (int z = 0; z < 4; z++)
 		{
 			GetID[z] = NULL;
+			GetPoints[z] = { NULL, NULL, NULL };
 			NoQuad = false;
 		}
 	}
