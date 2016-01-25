@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -38,9 +39,9 @@ Vertex CurrentPoint = StartPoint;
 int GetID[4];
 Vertex GetPoints[4];
 int GetIntersect[12];
-int GridNum =3;
+int GridNum =5;
 vector<Face> FaceList;
-
+vector<Vertex> NewPointList;
 
 
 //prototypes
@@ -49,7 +50,8 @@ bool GetQuad(int a, int b, int c, int j);
 void ThreeAxisSet();
 void EmptyArray(char Direction);
 void QuadChecker();
-void QuadCreator();
+void SortFaceList();
+void OptimizeVertexData();
 
 
 
@@ -57,9 +59,14 @@ void QuadCreator();
 int main()
 {
 	CreateVerticies();  //makes the verticies
+
+	OptimizeVertexData();  //removes inside verticies to make less quads
 	
 
-	
+
+
+
+
 	for (int i = 0; i < GridNum; i++)
 	{
 		for (int j = 0; j < GridNum; j++)
@@ -75,13 +82,13 @@ int main()
 	}
 
 
-	cout << "size of PointList: " << PointList.size() << endl;
+//	cout << "size of PointList: " << PointList.size() << endl;
 	cout << "Number of Faces: " << FaceList.size() << endl;
 	//cout << "number of Quads: " << FaceList.size() / 4 << endl;
 
-//	QuadCreator();   // Takes from list into our quad struct
-	
-	QuadChecker();	// Checks to see if all is well for our quad struct
+	SortFaceList();  //sorts FaceList to x,y,z faces
+
+	//QuadChecker();	// Checks to see if all is well for our quad struct
 	
 	
 #ifdef _WIN32
@@ -92,31 +99,91 @@ int main()
 
 
 
-
-
-void QuadCreator()
+void OptimizeVertexData()
 {
-	int QuadListCount = 0;
-	while (QuadListCount < QuadList.size())
+	for (int i = 0; i < PointList.size(); i++)
 	{
-		Vertex TempPoints[4];
-		int TempQuads[4];
-		Face TempFace;
-
-		for (int i = 0; i < 4; i++)
+		bool WriteToNewList[6] = { true, true, true, true, true, true };
+		Vertex Test[6] =
 		{
-			TempFace.Points[i] = PointList[QuadList[QuadListCount]];
-			TempFace.QuadLoc[i] = QuadList[QuadListCount];
-			QuadListCount += 1;
+			{ PointList[i].x + 1, PointList[i].y, PointList[i].z },
+			{ PointList[i].x - 1, PointList[i].y, PointList[i].z },
+			{ PointList[i].x, PointList[i].y + 1, PointList[i].z },
+			{ PointList[i].x, PointList[i].y - 1, PointList[i].z },
+			{ PointList[i].x, PointList[i].y, PointList[i].z + 1 },
+			{ PointList[i].x, PointList[i].y, PointList[i].z - 1 }
+		};
 
+		for (int j = 0; j < 6; j++)
+		{
+			for (int k = 0; k < PointList.size(); k++)
+			{
+				if (Test[j].x == PointList[k].x && Test[j].y == PointList[k].y && Test[j].z == PointList[k].z)
+				{
+					//cout << "Found a false at: " << i << ":" << j << endl;
+					WriteToNewList[j] = false;
+				}
+			}
 		}
-		FaceList.push_back(TempFace);
+		bool DoIt = false;
+		for (int l = 0; l < 6; l++)
+		{
+			if (WriteToNewList[l] == true)
+			{
+				DoIt = true;
+			}
+		}
+		if (DoIt == true)
+		{
+			//cout << "BINGO" << endl;
+			NewPointList.push_back(PointList[i]);
+		}
 
 	}
+
+	cout << "size of PointList: " << PointList.size() << endl;
+	cout << "size of NewPointList: " << NewPointList.size() << endl;
+
 
 }
 
 
+
+
+
+void SortFaceList()
+{
+	vector<Face> TempList;
+
+	for (int i = 0; i < FaceList.size() * 3; i++)   //sorting the faceValues to x,y,z direction
+	{
+		int ifix = i % FaceList.size();
+
+		if (ifix == i)
+		{
+			if (FaceList[ifix].Direction == 'x')
+				TempList.push_back(FaceList[ifix]);
+		}
+		else if (ifix == i - FaceList.size())
+		{
+			if (FaceList[ifix].Direction == 'y')
+				TempList.push_back(FaceList[ifix]);
+		}
+		else
+		{
+			if (FaceList[ifix].Direction == 'z')
+				TempList.push_back(FaceList[ifix]);
+		}
+
+	}
+
+	FaceList = TempList;
+
+	/*for (int i = 0; i < FaceList.size(); i++)  //just for verification
+	{
+	cout << FaceList[i].Direction << endl;
+	}*/
+}
 
 
 
@@ -243,9 +310,9 @@ bool GetQuad(int a, int b, int c, int j)     //the actual quad solver, uses a, b
 
 	bool NoPointFound = true;
 	CurrentPoint = { StartPoint.x + a, StartPoint.y + b, StartPoint.z + c };
-	for (int i = 0; i < PointList.size(); i++)
+	for (int i = 0; i < NewPointList.size(); i++)
 	{
-		if (CurrentPoint.x == PointList[i].x && CurrentPoint.y == PointList[i].y && CurrentPoint.z == PointList[i].z)
+		if (CurrentPoint.x == NewPointList[i].x && CurrentPoint.y == NewPointList[i].y && CurrentPoint.z == NewPointList[i].z)
 		{
 			GetID[j] = i;
 			GetPoints[j] = CurrentPoint;
@@ -256,6 +323,8 @@ bool GetQuad(int a, int b, int c, int j)     //the actual quad solver, uses a, b
 
 
 	}
+
+	
 	if (NoPointFound)
 	{
 		//cout << "NO QUADS!!!" << endl;   //if no vertex, then NO QUAD
