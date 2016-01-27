@@ -8,6 +8,8 @@
 #include <iostream>
 #include <string>
 
+
+
 using namespace std;
 
 
@@ -53,11 +55,29 @@ void QuadChecker();
 void SortFaceList();
 void OptimizeVertexData();
 
+//prototypes from SDL2_OpenGLCode.cpp
+bool initSDL();
+bool initGL();
+void update();
+void render();
+void KeyInput();
+void endSDL();
+
+extern bool EndLoop;
 
 
-
-int main()
+int main(int argc, char **argv)
 {
+	
+	initSDL();
+
+	while (!EndLoop)
+	{
+		KeyInput();
+		update();
+
+	}
+	
 	CreateVerticies();  //makes the verticies
 
 	OptimizeVertexData();  //removes inside verticies to make less quads
@@ -90,7 +110,8 @@ int main()
 
 	//QuadChecker();	// Checks to see if all is well for our quad struct
 	
-	
+	endSDL();
+
 #ifdef _WIN32
 	system("PAUSE");
 #endif
